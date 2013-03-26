@@ -6,7 +6,6 @@ def find(begin, goal):
 
     queue.append(path.Path(goal, begin))
 
-
     while True:
         path = queue.pop()
         node = path[-1]
@@ -24,7 +23,17 @@ def find(begin, goal):
                     path_to_node = q_path.sub_path(nb)
                     if path.absolute_distance > path_to_node.absolute_distance: continue
                     elif path_to_node > path:
-                        queue.pop(queue.index(q-path))
+                        queue.pop(queue.index(q_path))
 
             queue.sort()
 
+if __name__ == '__main__':
+    import random_field, random
+
+    map = random_field.main(100, 20, 20, 10, 10)
+    start = random.choice(map)
+    dest = random.choice(map)
+    while start is dest:
+        dest = random.choice(map)
+
+    find(start, dest)

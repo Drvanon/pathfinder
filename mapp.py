@@ -17,3 +17,6 @@ class Map(object):
             stri += '  '+str(i)+'\n'
         stri += ')>'
         return stri
+
+    def __len__(self):
+        return len(self.map)
