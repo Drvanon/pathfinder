@@ -93,6 +93,7 @@ def run(width, height, nodes_total, max_nbs, max_dist):
 
                 # See if we're hovering over a node, and if yes, select it.
                 for rect, rect_node in node_rects:
+                    rect.scale_ip(2) # Make it a little bigger, for UI purposes
                     if not rect.collidepoint(event.pos):
                         continue
 
