@@ -21,7 +21,10 @@ def main(amount_of_nodes, max_x, max_y, max_range, max_connections, readymap=Non
             all_nodes_within_range.remove(chosen_node)
             chosen_nodes.append(chosen_node)
         if not chosen_nodes:
-            print('ALERT: This node has no connections')
+            all_nodes = {}
+            for node in mymap:
+                all_nodes[node] = self.measure_distance(node)
+            chosen_nodes.append(min(all_nodes))
         for node2 in chosen_nodes:
             node2.add_neighbour(node)
 
