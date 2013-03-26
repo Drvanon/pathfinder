@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
 import random
-import mapp, nodes
+import mapp
+import nodes
 
-def main(amount_of_nodes, max_x, max_y, max_range, max_connections, readymap=None):
-    mymap = mapp.Map(amount_of_nodes, max_x, max_y, readymap) 
+
+def main(amount_of_nodes, max_x, max_y, max_range, max_connections,
+         readymap=None):
+    mymap = mapp.Map(amount_of_nodes, max_x, max_y, readymap)
     for node in mymap:
         all_nodes_within_range = []
         for node2 in mymap:
@@ -22,12 +26,13 @@ def main(amount_of_nodes, max_x, max_y, max_range, max_connections, readymap=Non
             chosen_nodes.append(chosen_node)
         if not chosen_nodes:
             all_nodes = {}
-            for node in mymap:
-                all_nodes[node] = self.measure_distance(node)
+            for node2 in mymap:
+                all_nodes[node] = node.measure_distance(node2)
             chosen_nodes.append(min(all_nodes))
         for node2 in chosen_nodes:
             node2.add_neighbour(node)
 
     return mymap
 
-print(main(100, 20, 20, 10, 10))
+if __name__ == '__main__':
+    print(main(100, 20, 20, 10, 10))
