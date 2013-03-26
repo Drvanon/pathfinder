@@ -11,7 +11,7 @@ def find(begin, goal):
         node = cur_path[-1]
         for nb in node.neighbours:
             # don't go backwards
-            if nb in path: continue
+            if nb in cur_path: continue
             new_path = cur_path.add_node(nb)
 
             # stop if we have gone too far
