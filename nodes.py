@@ -21,6 +21,9 @@ class Node(object):
         return math.sqrt(pow(self.x - node.x, 2)+ pow(self.y - node.y, 2))
 
     def __repr__(self):
+        return '<Node {}, {}>'.format(self.x, self.y)
+
+    def long_repr(self):
         stri = '<Node {}, {} connected:\n'.format(self.x, self.y)
         for i in self.neighbours:
             stri += '    {0}, {1}\n'.format(i.x, i.y)
