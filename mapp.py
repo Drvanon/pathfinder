@@ -18,5 +18,8 @@ class Map(object):
         stri += ')>'
         return stri
 
+    def __getitem__(self, key):
+        return self.map[key]
+
     def __len__(self):
         return len(self.map)
