@@ -11,12 +11,12 @@ while True:
 
         # stop if we have gone too far
         for c_path in complete:
-            if path > c_path: break # TODO path.length, is already a iterable rl(9)
+            if path.absolute_distance > c_path.absolute_distance: break
 
         for q_path in queue:
             if nb in q_path:
                 path_to_node = q_path.sub_path(nb)
-                if path > path_to_node: continue # TODO same as rl(14)
+                if path.absolute_distance > path_to_node.absolute_distance: continue
                 elif path_to_node > path:
                     queue.pop(queue.index(q-path))
 
