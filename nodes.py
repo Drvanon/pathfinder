@@ -10,8 +10,12 @@ class Node(object):
             self.neighbours = []
 
     def add_neighbour(self, neighbour):
-        self.neighbours.append(neighbour)
-        neighbour.neighbours.append(self)
+        if neighbour is self:
+            return
+        if not neighbour in self.neighbours:
+            self.neighbours.append(neighbour)
+        if not self in neighbour.neighbours:
+            neighbour.neighbours.append(self)
 
     def measure_distance(self, node):
         return math.sqrt(pow(self.x - node.x, 2)+ pow(self.y - node.y, 2))

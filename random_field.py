@@ -24,7 +24,7 @@ def main(amount_of_nodes, max_x, max_y, max_range, max_connections, readymap=Non
             print('ALERT: This node has no connections')
         for node2 in chosen_nodes:
             node2.add_neighbour(node)
-            
+
     return mymap
 
 print(main(100, 20, 20, 10, 10))
