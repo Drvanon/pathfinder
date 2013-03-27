@@ -5,7 +5,7 @@ class Path(object):
         self.absolute_distance = 0
         try: # If list is given:
             iter(nodes)
-            self.nodes = Nodes
+            self.nodes = nodes
         except TypeError: # Else: start with the given node
             if nodes:
                 self.start(nodes)
@@ -21,11 +21,11 @@ class Path(object):
     def add_node(self, node):
         new_nodes = self.nodes
         new_nodes.append(node)
-        path = Path(new_nodes)
+        path = Path(self.goal, new_nodes)
         return path
 
     def sub_path(self, node):
-        if not node in path:
+        if not node in self:
             raise LookupError('No such node ({}) in this path.'.format(node))
         return Path(self.nodes[:self.nodes.index(node)])
 
