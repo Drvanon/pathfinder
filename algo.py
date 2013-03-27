@@ -9,6 +9,7 @@ def find(begin, goal):
     while True:
         cur_path = queue.pop()
         node = cur_path[-1]
+        new_paths = []
         for nb in node.neighbours:
             # don't go backwards
             if nb in cur_path: continue
@@ -16,16 +17,24 @@ def find(begin, goal):
 
             # stop if we have gone too far
             for c_path in complete:
-                if cur_path.absolute_distance > c_path.absolute_distance: break
+                if new_path.absolute_distance > c_path.absolute_distance: break
 
             for q_path in queue:
                 if nb in q_path:
                     path_to_node = q_path.sub_path(nb)
-                    if cur_path.absolute_distance > path_to_node.absolute_distance: continue
+                    if cur_path.absolute_distance > path_to_node.absolute_distance:
+                        continue
                     elif path_to_node > cur_path:
                         queue.pop(queue.index(q_path))
 
-            queue.sort()
+            new_paths.append(new_path)
+
+        sorted_new_paths = sorted(new_paths, key=lambda ppath:ppath.absolute_distance)
+        sorted_new_paths.reverse()
+        for pathh in sorted_new_paths:
+            queue.insert(0, pathh)
+
+        queue =  sorted(queue, key=lambda ppath:ppath.absolute_distance)
 
 if __name__ == '__main__':
     import random_field, random

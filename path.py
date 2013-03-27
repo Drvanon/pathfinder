@@ -2,6 +2,7 @@ class Path(object):
     def __init__(self, goal, nodes=None):
         self.nodes = []
         self.total_distance = 0
+        self.absolute_distance = 0
         try: # If list is given:
             iter(nodes)
             self.nodes = Nodes
