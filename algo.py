@@ -3,10 +3,14 @@ import path
 def find(begin, goal):
     queue = []
     complete = []
+    just_started = True
 
     queue.append(path.Path(goal, begin))
 
     while True:
+        print(queue)
+        if len(queue) == 1 and not just_started:
+            return queue.pop()
         cur_path = queue.pop()
         node = cur_path[-1]
         new_paths = []
@@ -35,6 +39,7 @@ def find(begin, goal):
             queue.insert(0, pathh)
 
         queue =  sorted(queue, key=lambda ppath:ppath.absolute_distance)
+        just_started = False
 
 if __name__ == '__main__':
     import random_field, random
