@@ -6,7 +6,7 @@ class Pathfinder(object):
     def __init__(self, node_map, begin, goal):
         self.node_map = node_map
         self.queue = []
-        self.complete = []
+        self.complete = None
 
         self.begin = begin
         self.goal = goal
@@ -17,6 +17,7 @@ class Pathfinder(object):
         self.queue.append(path.Path(self.goal, self.begin))
 
     def step(self):
+        print(self.queue)
         if len(self.queue) == 1 and not self.first_run:
             self.solution = self.queue.pop()
             return self.solution
@@ -33,9 +34,14 @@ class Pathfinder(object):
             new_path = path.add_node(nb)
             add_nb = True
 
+            if nb is self.goal:
+                if new_path.total_distance < self.complete.total_distance:
+                    new_path = self.complete
+                break
+
             # Stop if we have gone too far
-            for c_path in self.complete:
-                if new_path.total_distance > c_path.total_distance:
+            if self.complete:
+                if self.complete.total_distance < new_path.total_distance:
                     add_nb = False
 
             for q_path in self.queue:
@@ -54,14 +60,14 @@ class Pathfinder(object):
         self.queue.extend(new_paths)
 
         # Sort queue by absolute distance
-        self.queue.sort(key=lambda path: path.absolute_distance)
+        self.queue.sort(key=lambda path: path.absolute_distance + path.total_distance)
         return None
 
     def run(self):
         while True:
             s = self.step()
             if s is not None:
-                return s
+                return self.complete
 
 
 if __name__ == '__main__':
