@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 import random
-import mapp
+import node_map
 import nodes
 
 
 def main(amount_of_nodes, max_x, max_y, max_range, max_connections,
          readymap=None):
-    mymap = mapp.Map(amount_of_nodes, max_x, max_y, readymap)
+    mymap = node_map.NodeMap(amount_of_nodes, max_x, max_y, readymap)
     for node in mymap:
         all_nodes_within_range = []
         for node2 in mymap:

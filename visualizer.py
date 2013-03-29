@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import sys
+import random
 import pygame
 from random_field import main
+import pathfinder
 
 # Global constants, I'm so sorry :(
 BACKGROUND = (255, 255, 255)
@@ -21,6 +23,16 @@ def draw_node(screen, node, color=NODE_COLOR):
     """Draws a circle with radius 2 at node's position on screen, in color."""
     pygame.draw.circle(screen, color, _node_pos(node), 2, 0)
 
+def draw_connection(screen, node, node2, color=LINE_COLOR,
+                    node_color=NODE_COLOR):
+    """Draws a single connection between two nodes."""
+    if not node2 in node.neighbours:
+        raise ValueError('These nodes are not connected.')
+
+    pygame.draw.line(screen, color, _node_pos(node), _node_pos(node2))
+
+    pygame.draw.circle(screen, node_color, _node_pos(node), 2, 0)
+    pygame.draw.circle(screen, node_color, _node_pos(node2), 2, 0)
 
 def draw_connections(screen, node, color=LINE_COLOR, node_color=NODE_COLOR,
                      drawn=None):
@@ -31,10 +43,7 @@ def draw_connections(screen, node, color=LINE_COLOR, node_color=NODE_COLOR,
     for nb in node.neighbours:
         if (node, nb) in drawn or (nb, node) in drawn:
             continue
-        pygame.draw.line(screen, color, _node_pos(node), _node_pos(nb))
-
-        pygame.draw.circle(screen, node_color, _node_pos(node), 2, 0)
-        pygame.draw.circle(screen, node_color, _node_pos(nb), 2, 0)
+        draw_connection(screen, node, nb, color, node_color)
         drawn.append((node, nb))
     return drawn
 
@@ -56,19 +65,19 @@ def run(width, height, nodes_total, max_nbs, max_dist):
     print('Generating and drawing nodes... ', end='')
     sys.stdout.flush()
     # Let's have a 10px padding.
-    map_ = main(nodes_total, width-MARGIN*2, height-MARGIN*2, max_dist, max_nbs)
+    node_map = main(nodes_total, width-MARGIN*2, height-MARGIN*2, max_dist, max_nbs)
     node_rects = []
-    for node in map_:
+    for node in node_map:
         draw_node(screen, node)
         x, y = _node_pos(node)
-        node_rects.append((pygame.Rect(x-2, y-2, 5, 5), node))
+        node_rects.append((pygame.Rect(x-3, y-3, 7, 7), node))
     print('done.')
     pygame.display.flip()
 
     print('Drawing connections... ', end='')
     sys.stdout.flush()
     drawn_connections = []
-    for node in map_:
+    for node in node_map:
         drawn_connections = draw_connections(
             screen, node, drawn=drawn_connections
         )
@@ -76,7 +85,7 @@ def run(width, height, nodes_total, max_nbs, max_dist):
     print('done.')
     pygame.display.flip()
 
-    print('Run main loop.')
+    print('Running main loop. Press R to start pathfinder.')
     sys.stdout.flush()
     selected = None
     while True:
@@ -93,7 +102,6 @@ def run(width, height, nodes_total, max_nbs, max_dist):
 
                 # See if we're hovering over a node, and if yes, select it.
                 for rect, rect_node in node_rects:
-                    rect.scale_ip(2) # Make it a little bigger, for UI purposes
                     if not rect.collidepoint(event.pos):
                         continue
 
@@ -104,6 +112,26 @@ def run(width, height, nodes_total, max_nbs, max_dist):
                     pygame.display.flip()
                     selected = (rect, rect_node)
 
+            if event.type == pygame.KEYUP and event.key == 114:
+                print('Finding starting node and goal node...', end='')
+                start = random.choice(node_map)
+                dest = random.choice(node_map)
+                while start is dest:
+                    dest = random.choice(node_map)
+                print('done.')
+
+                print('Initiliazing pathfinder... ', end='')
+                pf = pathfinder.Pathfinder(node_map, start, dest)
+                print('done.')
+
+                print('Finding path... ', end='')
+                path = pf.run()
+                for i, node in enumerate(path):
+                    print(node.long_repr(), path[i+1])
+                    draw_node(screen, node, SELECT_COLOR)
+                    draw_connection(screen, node, path[i+1], SELECT_COLOR,
+                                    SELECT_COLOR)
+                print('done.')
 
 if __name__ == '__main__':
     width = int(input('Screen width [700]: ') or 700)

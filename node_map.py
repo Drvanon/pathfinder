@@ -1,6 +1,6 @@
 import nodes, random
 
-class Map(object):
+class NodeMap(object):
     def __init__(self, amount_of_nodes, max_x, max_y, list_of_nodes=None):
         if not list_of_nodes:
             self.map = [nodes.Node(random.randint(0, max_x),
