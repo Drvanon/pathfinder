@@ -16,13 +16,31 @@ class Pathfinder(object):
 
         self.queue.append(path.Path(self.goal, self.begin))
 
+    def save_self(self):
+        # Do not know why I have to do this, but so be it
+        if not self.queue: # If queue is empty but no ways where found, try again
+            self.queue.append(path.Path(self.goal, self.begin))
+
+
+    def print(self):
+        if self.complete:
+            print("len queue: " + str(len(self.queue)) + "\n" + \
+                    "found solution? yes")
+        else:
+            print("len queue: " + str(len(self.queue)) + "\n" + \
+                    "found solution? no")
+        print("-------------------------------------")
+
+
     def step(self):
-        print(self.queue)
-        if len(self.queue) == 1 and not self.first_run:
+        self.print()
+        if not self.first_run and self.complete:
             self.solution = self.queue.pop()
-            return self.solution
+            return True
         elif self.first_run:
             self.first_run = False
+
+        self.save_self()
 
         path = self.queue.pop()
         node = path[-1]
@@ -35,8 +53,11 @@ class Pathfinder(object):
             add_nb = True
 
             if nb is self.goal:
-                if new_path.total_distance < self.complete.total_distance:
-                    new_path = self.complete
+                print('goal reached')
+                if self.complete:
+                    if new_path.total_distance > self.complete.total_distance:
+                        break
+                self.complete = new_path
                 break
 
             # Stop if we have gone too far
@@ -44,15 +65,15 @@ class Pathfinder(object):
                 if self.complete.total_distance < new_path.total_distance:
                     add_nb = False
 
-            for q_path in self.queue:
-                if nb in q_path:
-                    q_path_to_nb = q_path.sub_path(nb)
-                    # If the other way to this nb is shorter, pick that.
-                    if path.total_distance > q_path_to_nb.total_distance:
-                        add_nb = False
-                    # Otherwise, remove that path from the queue.
-                    elif q_path_to_nb.total_distance > path.total_distance:
-                        self.queue.pop(self.queue.index(q_path))
+            #for q_path in self.queue:
+            #    if nb in q_path:
+            #        q_path_to_nb = q_path.sub_path(nb)
+            #        # If the other way to this nb is shorter, pick that.
+            #        if path.total_distance > q_path_to_nb.total_distance:
+            #            add_nb = False
+            #        # Otherwise, remove that path from the queue.
+            #        elif q_path_to_nb.total_distance > path.total_distance:
+            #            self.queue.pop(self.queue.index(q_path))
 
             if add_nb:
                 new_paths.append(new_path)
@@ -66,7 +87,7 @@ class Pathfinder(object):
     def run(self):
         while True:
             s = self.step()
-            if s is not None:
+            if s:
                 return self.complete
 
 

@@ -95,6 +95,8 @@ def run(width, height, nodes_total, max_nbs, max_dist, step=False):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
+            if event.type == (event.type == pygame.KEYUP and event.key == 13):
+                go_step = True
             if event.type == pygame.MOUSEMOTION:
                 # If we previously had a point selected (by mouseover), check
                 # whether or not we should deselect it.
@@ -133,7 +135,7 @@ def run(width, height, nodes_total, max_nbs, max_dist, step=False):
                     print('done.')
 
                 if step:
-                    path = do_step()
+                    path = do_step(pf)
                     go_step = True
                 else:
                     path = find_path(pf)
@@ -147,6 +149,8 @@ def run(width, height, nodes_total, max_nbs, max_dist, step=False):
                 draw_node(screen, dest, END_COLOR)
                 pygame.display.flip()
 
+        go_step = False
+
 
 def find_path(pf):
     print('Finding path... ', end='')
@@ -158,7 +162,7 @@ def do_step(pf):
     print('Taking step ... ', end='')
     pf.step()
     print('done.')
-    return pf.path[0]
+    return pf.queue[0]
 
 if __name__ == '__main__':
     width = int(input('Screen width [700]: ') or 700)
@@ -166,5 +170,6 @@ if __name__ == '__main__':
     nodes_total = int(input('Amount of nodes [150]: ') or 150)
     max_nbs = int(input('Maximum neighbours [10]: ') or 10)
     max_dist = int(input('Maximum distance [100]: ') or 100)
+    step = int(input('Take steps (type 0) [True]: ') or True)
 
-    run(width, height, nodes_total, max_nbs, max_dist)
+    run(width, height, nodes_total, max_nbs, max_dist, step)
