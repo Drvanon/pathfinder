@@ -19,6 +19,12 @@ class Path(object):
             self.absolute_distance = self.nodes[-1].measure_distance(self.goal)
 
     def add_node(self, node):
+        neighbour_exists = False
+        for my_node in self.nodes:
+            if node in my_node.neighbours:
+                neighbour_exists = True
+        assert neighbour_exists
+
         new_nodes = self.nodes
         new_nodes.append(node)
         path = Path(self.goal, new_nodes)
@@ -34,6 +40,9 @@ class Path(object):
 
     def __iter__(self):
         return self.nodes.__iter__()
+
+    def __len__(self):
+        return len(self.nodes)
 
     def __getitem__(self, key):
         return self.nodes[key]

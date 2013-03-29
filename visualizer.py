@@ -11,6 +11,10 @@ LINE_COLOR = (200, 200, 200)
 NODE_COLOR = (0, 0, 0)
 SELECT_COLOR = (255, 0, 0)
 
+START_COLOR = (0, 255, 0)
+END_COLOR = (0, 0, 255)
+PATH_COLOR = (13, 152, 186)
+
 MARGIN = 10
 
 
@@ -26,9 +30,6 @@ def draw_node(screen, node, color=NODE_COLOR):
 def draw_connection(screen, node, node2, color=LINE_COLOR,
                     node_color=NODE_COLOR):
     """Draws a single connection between two nodes."""
-    if not node2 in node.neighbours:
-        raise ValueError('These nodes are not connected.')
-
     pygame.draw.line(screen, color, _node_pos(node), _node_pos(node2))
 
     pygame.draw.circle(screen, node_color, _node_pos(node), 2, 0)
@@ -118,6 +119,9 @@ def run(width, height, nodes_total, max_nbs, max_dist):
                 dest = random.choice(node_map)
                 while start is dest:
                     dest = random.choice(node_map)
+                draw_node(screen, start, START_COLOR)
+                draw_node(screen, dest, END_COLOR)
+                pygame.display.flip()
                 print('done.')
 
                 print('Initiliazing pathfinder... ', end='')
@@ -127,10 +131,13 @@ def run(width, height, nodes_total, max_nbs, max_dist):
                 print('Finding path... ', end='')
                 path = pf.run()
                 for i, node in enumerate(path):
-                    print(node.long_repr(), path[i+1])
                     draw_node(screen, node, SELECT_COLOR)
-                    draw_connection(screen, node, path[i+1], SELECT_COLOR,
-                                    SELECT_COLOR)
+                    if not i == len(path) - 1:
+                        draw_connection(screen, node, path[i+1], PATH_COLOR,
+                                        PATH_COLOR)
+                draw_node(screen, start, START_COLOR)
+                draw_node(screen, dest, END_COLOR)
+                pygame.display.flip()
                 print('done.')
 
 if __name__ == '__main__':
