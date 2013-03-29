@@ -49,7 +49,7 @@ def draw_connections(screen, node, color=LINE_COLOR, node_color=NODE_COLOR,
     return drawn
 
 
-def run(width, height, nodes_total, max_nbs, max_dist):
+def run(width, height, nodes_total, max_nbs, max_dist, step=False):
     print('Initializing Pygame... ', end='')
     sys.stdout.flush()
     pygame.init()
@@ -89,6 +89,9 @@ def run(width, height, nodes_total, max_nbs, max_dist):
     print('Running main loop. Press R to start pathfinder.')
     sys.stdout.flush()
     selected = None
+
+    go_step = False
+    pf = None
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
@@ -113,23 +116,28 @@ def run(width, height, nodes_total, max_nbs, max_dist):
                     pygame.display.flip()
                     selected = (rect, rect_node)
 
-            if event.type == pygame.KEYUP and event.key == 114:
-                print('Finding starting node and goal node...', end='')
-                start = random.choice(node_map)
-                dest = random.choice(node_map)
-                while start is dest:
+            if (event.type == pygame.KEYUP and event.key == 114) or go_step:
+                if not go_step:
+                    print('Finding starting node and goal node...', end='')
+                    start = random.choice(node_map)
                     dest = random.choice(node_map)
-                draw_node(screen, start, START_COLOR)
-                draw_node(screen, dest, END_COLOR)
-                pygame.display.flip()
-                print('done.')
+                    while start is dest:
+                        dest = random.choice(node_map)
+                    draw_node(screen, start, START_COLOR)
+                    draw_node(screen, dest, END_COLOR)
+                    pygame.display.flip()
+                    print('done.')
 
-                print('Initiliazing pathfinder... ', end='')
-                pf = pathfinder.Pathfinder(node_map, start, dest)
-                print('done.')
+                    print('Initiliazing pathfinder... ', end='')
+                    pf = pathfinder.Pathfinder(node_map, start, dest)
+                    print('done.')
 
-                print('Finding path... ', end='')
-                path = pf.run()
+                if step:
+                    path = do_step()
+                    go_step = True
+                else:
+                    path = find_path(pf)
+
                 for i, node in enumerate(path):
                     draw_node(screen, node, SELECT_COLOR)
                     if not i == len(path) - 1:
@@ -138,7 +146,19 @@ def run(width, height, nodes_total, max_nbs, max_dist):
                 draw_node(screen, start, START_COLOR)
                 draw_node(screen, dest, END_COLOR)
                 pygame.display.flip()
-                print('done.')
+
+
+def find_path(pf):
+    print('Finding path... ', end='')
+    path = pf.run()
+    print('done.')
+    return path
+
+def do_step(pf):
+    print('Taking step ... ', end='')
+    pf.step()
+    print('done.')
+    return pf.path[0]
 
 if __name__ == '__main__':
     width = int(input('Screen width [700]: ') or 700)
