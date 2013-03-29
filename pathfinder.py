@@ -19,6 +19,8 @@ class Pathfinder(object):
     def step(self):
         if len(self.queue) == 1 and not self.first_run:
             self.solution = self.queue.pop()
+            for i, node in enumerate(self.solution):
+                assert self.solution[i + 1] in node.neighbours
             return self.solution
         elif self.first_run:
             self.first_run = False
