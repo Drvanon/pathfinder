@@ -90,86 +90,52 @@ def run(width, height, nodes_total, max_nbs, max_dist, step=False):
     sys.stdout.flush()
     selected = None
 
-    go_step = False
-    pf = None
+    start = random.choice(node_map)
+    dest = random.choice(node_map)
+    while start is dest:
+        dest = random.choice(node_map)
+
+    pf = pathfinder.Pathfinder(node_map, start, dest)
+
+    clock = pygame.time.Clock()
+    clock.tick()
+
+    skip_all = False
+    path = None
+    pygame.time.set_timer(31, 100)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
-            if event.type == (event.type == pygame.KEYUP and event.key == 13):
-                go_step = True
-            if event.type == pygame.MOUSEMOTION:
-                # If we previously had a point selected (by mouseover), check
-                # whether or not we should deselect it.
-                if selected is not None and\
-                   not selected[0].collidepoint(event.pos):
-                    rect, rect_node = selected
-                    draw_connections(screen, rect_node)
-                    pygame.display.flip()
+            if event.type == 31:
+                if pf.step():
+                    skip_all = True
 
-                # See if we're hovering over a node, and if yes, select it.
-                for rect, rect_node in node_rects:
-                    if not rect.collidepoint(event.pos):
-                        continue
+        draw_node(screen, start, START_COLOR)
+        draw_node(screen, dest, END_COLOR)
+        pygame.display.flip()
 
-                    # Selecting means highlighting the node and the connections
-                    # in SELECT_COLOR.
-                    draw_connections(screen, rect_node, SELECT_COLOR)
-                    draw_node(screen, rect_node, SELECT_COLOR)
-                    pygame.display.flip()
-                    selected = (rect, rect_node)
+        if not skip_all:
+            path = []
+            if pf.complete:
+                path = pf.complete
+            else:
+                path = pf.queue[0]
 
-            if (event.type == pygame.KEYUP and event.key == 114) or go_step:
-                if not go_step:
-                    print('Finding starting node and goal node...', end='')
-                    start = random.choice(node_map)
-                    dest = random.choice(node_map)
-                    while start is dest:
-                        dest = random.choice(node_map)
-                    draw_node(screen, start, START_COLOR)
-                    draw_node(screen, dest, END_COLOR)
-                    pygame.display.flip()
-                    print('done.')
-
-                    print('Initiliazing pathfinder... ', end='')
-                    pf = pathfinder.Pathfinder(node_map, start, dest)
-                    print('done.')
-
-                if step:
-                    path = do_step(pf)
-                    go_step = True
-                else:
-                    path = find_path(pf)
-
-                for i, node in enumerate(path):
-                    draw_node(screen, node, SELECT_COLOR)
-                    if not i == len(path) - 1:
-                        draw_connection(screen, node, path[i+1], PATH_COLOR,
-                                        PATH_COLOR)
-                draw_node(screen, start, START_COLOR)
-                draw_node(screen, dest, END_COLOR)
-                pygame.display.flip()
-
-        go_step = False
-
-
-def find_path(pf):
-    print('Finding path... ', end='')
-    path = pf.run()
-    print('done.')
-    return path
-
-def do_step(pf):
-    print('Taking step ... ', end='')
-    pf.step()
-    print('done.')
-    return pf.queue[0]
+        for i, node in enumerate(path):
+            draw_node(screen, node, SELECT_COLOR)
+            if not i == len(path) - 1:
+                draw_connection(screen, node, path[i+1], PATH_COLOR,
+                                PATH_COLOR)
+        draw_node(screen, start, START_COLOR)
+        draw_node(screen, dest, END_COLOR)
+        pygame.display.flip()
 
 if __name__ == '__main__':
-    width = int(input('Screen width [700]: ') or 700)
-    height = int(input('Screen height [700]: ') or 700)
-    nodes_total = int(input('Amount of nodes [150]: ') or 150)
+    width = int(input('Screen width [100]: ') or 500)
+    height = int(input('Screen height [100]: ') or 500)
+    nodes_total = int(input('Amount of nodes [100]: ') or 100)
     max_nbs = int(input('Maximum neighbours [10]: ') or 10)
-    max_dist = int(input('Maximum distance [100]: ') or 100)
-    step = int(input('Take steps (type 0) [True]: ') or True)
+    max_dist = int(input('Maximum distance [20]: ') or 100)
+    step = False
 
     run(width, height, nodes_total, max_nbs, max_dist, step)

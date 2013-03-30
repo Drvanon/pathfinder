@@ -19,7 +19,7 @@ class Pathfinder(object):
     def save_self(self):
         # Do not know why I have to do this, but so be it
         if not self.queue: # If queue is empty but no ways where found, try again
-            self.queue.append(path.Path(self.goal, self.begin))
+            self.queue.append(path.Path(self.goal, [self.begin]))
 
 
     def print(self):
@@ -35,7 +35,6 @@ class Pathfinder(object):
     def step(self):
         self.print()
         if not self.first_run and self.complete:
-            self.solution = self.queue.pop()
             return True
         elif self.first_run:
             self.first_run = False
@@ -65,23 +64,28 @@ class Pathfinder(object):
                 if self.complete.total_distance < new_path.total_distance:
                     add_nb = False
 
-            #for q_path in self.queue:
-            #    if nb in q_path:
-            #        q_path_to_nb = q_path.sub_path(nb)
-            #        # If the other way to this nb is shorter, pick that.
-            #        if path.total_distance > q_path_to_nb.total_distance:
-            #            add_nb = False
-            #        # Otherwise, remove that path from the queue.
-            #        elif q_path_to_nb.total_distance > path.total_distance:
-            #            self.queue.pop(self.queue.index(q_path))
+            for q_path in self.queue:
+                if nb in q_path:
+                    q_path_to_nb = q_path.sub_path(nb)
+                    # If the other way to this nb is shorter, pick that.
+                    if path.total_distance > q_path_to_nb.total_distance:
+                        add_nb = False
+                    # Otherwise, remove that path from the queue.
+                    else:
+                        self.queue.pop(self.queue.index(q_path))
 
             if add_nb:
                 new_paths.append(new_path)
 
         self.queue.extend(new_paths)
+        if not new_paths:
+            print('No new path could be found')
+            self.queue.pop(0)
+            return True
 
         # Sort queue by absolute distance
         self.queue.sort(key=lambda path: path.absolute_distance + path.total_distance)
+
         return None
 
     def run(self):
@@ -103,4 +107,6 @@ if __name__ == '__main__':
 
     pf = Pathfinder(node_map, start, dest)
     path = pf.run()
-    print(path)
+    print('\n\n\n\n\n\n\n\n\n\n')
+    print('nodes: '+ str(len(path.nodes)))
+    print('distance: ' + str(start.measure_distance(dest)))
